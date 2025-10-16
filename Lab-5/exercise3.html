@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Form Builder & Validator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .button-group {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #submitBtn {
+            background-color: #2196F3;
+        }
+
+        #submitBtn:hover {
+            background-color: #0b7dda;
+        }
+
+        #formContainer {
+            margin: 20px 0;
+        }
+
+        .form-field {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .invalid {
+            border-color: red !important;
+            background-color: #ffe6e6;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Dynamic Form Builder</h2>
+
+        <div class="button-group">
+            <button onclick="addField('text')">Add Text Field</button>
+            <button onclick="addField('email')">Add Email Field</button>
+            <button onclick="addField('dropdown')">Add Dropdown</button>
+        </div>
+
+        <form id="dynamicForm">
+            <div id="formContainer"></div>
+            <button type="button" id="submitBtn" onclick="validateForm()">Submit Form</button>
+        </form>
+    </div>
+
+    <script>
+        var fieldCount = 0;
+
+        function addField(fieldType) {
+            var container = document.getElementById("formContainer");
+            var fieldDiv = document.createElement("div");
+            fieldDiv.className = "form-field";
+            fieldDiv.id = "field_" + fieldCount;
+
+            var label = document.createElement("label");
+            var input;
+
+            switch(fieldType) {
+                case 'text':
+                    label.innerHTML = "Text Field " + (fieldCount + 1);
+                    input = document.createElement("input");
+                    input.type = "text";
+                    input.name = "text_" + fieldCount;
+                    input.id = "input_" + fieldCount;
+                    input.placeholder = "Enter text";
+                    input.setAttribute("data-type", "text");
+                    break;
+
+                case 'email':
+                    label.innerHTML = "Email Field " + (fieldCount + 1);
+                    input = document.createElement("input");
+                    input.type = "text";
+                    input.name = "email_" + fieldCount;
+                    input.id = "input_" + fieldCount;
+                    input.placeholder = "Enter email";
+                    input.setAttribute("data-type", "email");
+                    break;
+
+                case 'dropdown':
+                    label.innerHTML = "Dropdown " + (fieldCount + 1);
+                    input = document.createElement("select");
+                    input.name = "dropdown_" + fieldCount;
+                    input.id = "input_" + fieldCount;
+                    input.setAttribute("data-type", "dropdown");
+
+                    var defaultOption = document.createElement("option");
+                    defaultOption.value = "";
+                    defaultOption.innerHTML = "-- Select Option --";
+                    input.appendChild(defaultOption);
+
+                    var option1 = document.createElement("option");
+                    option1.value = "option1";
+                    option1.innerHTML = "Option 1";
+                    input.appendChild(option1);
+
+                    var option2 = document.createElement("option");
+                    option2.value = "option2";
+                    option2.innerHTML = "Option 2";
+                    input.appendChild(option2);
+
+                    var option3 = document.createElement("option");
+                    option3.value = "option3";
+                    option3.innerHTML = "Option 3";
+                    input.appendChild(option3);
+                    break;
+
+                default:
+                    alert("Unknown field type");
+                    return;
+            }
+
+            fieldDiv.appendChild(label);
+            fieldDiv.appendChild(input);
+            container.appendChild(fieldDiv);
+
+            fieldCount = fieldCount + 1;
+        }
+
+        function validateForm() {
+            try {
+                var isValid = true;
+                var errorMessage = "";
+
+                var inputs = document.getElementById("formContainer").getElementsByTagName("*");
+
+                for (var i = 0; i < inputs.length; i++) {
+                    var element = inputs[i];
+
+                    if (element.tagName == "INPUT" || element.tagName == "SELECT") {
+                        var fieldType = element.getAttribute("data-type");
+                        var value = element.value;
+
+                        element.className = "";
+
+                        var errorDiv = element.parentNode.querySelector(".error-message");
+                        if (errorDiv) {
+                            element.parentNode.removeChild(errorDiv);
+                        }
+
+                        if (fieldType == "text") {
+                            if (value == null || value.trim() == "") {
+                                element.className = "invalid";
+                                isValid = false;
+                                errorMessage = "Text field cannot be empty!";
+                                showError(element, errorMessage);
+                                throw errorMessage;
+                            }
+                        }
+
+                        if (fieldType == "email") {
+                            if (value == null || value.trim() == "") {
+                                element.className = "invalid";
+                                isValid = false;
+                                errorMessage = "Email field cannot be empty!";
+                                showError(element, errorMessage);
+                                throw errorMessage;
+                            }
+
+                            var emailRegex = /^[a-z0-9]+@[a-z]+\.(com|net|org|info)$/;
+                            if (!emailRegex.test(value)) {
+                                element.className = "invalid";
+                                isValid = false;
+                                errorMessage = "Invalid email format!";
+                                showError(element, errorMessage);
+                                throw errorMessage;
+                            }
+                        }
+
+                        if (fieldType == "dropdown") {
+                            if (value == null || value == "") {
+                                element.className = "invalid";
+                                isValid = false;
+                                errorMessage = "Please select an option from dropdown!";
+                                showError(element, errorMessage);
+                                throw errorMessage;
+                            }
+                        }
+                    }
+                }
+
+                if (isValid) {
+                    alert("Form submitted successfully!");
+                }
+
+            } catch (error) {
+                alert("Validation Error: " + error);
+            }
+        }
+
+        function showError(element, message) {
+            var errorDiv = document.createElement("div");
+            errorDiv.className = "error-message";
+            errorDiv.innerHTML = message;
+            element.parentNode.appendChild(errorDiv);
+        }
+    </script>
+</body>
+
+</html>
