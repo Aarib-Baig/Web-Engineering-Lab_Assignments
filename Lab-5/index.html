@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add To Cart System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .product {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            display: inline-block;
+            width: 200px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .remove-btn {
+            background-color: #f44336;
+        }
+
+        .remove-btn:hover {
+            background-color: #da190b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #total {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="exercise2.html">Click here to view EXERCISE 2</a>
+    <br>
+    <a href="exercise3.html">Click here to view EXERCISE 3</a>
+    <br>
+    <a href="exercise4.html">Click here to view EXERCISE 4</a>
+
+    <h2>Product List</h2>
+
+    <div class="product">
+        <h3>Laptop</h3>
+        <p>Price: Rs. 50000</p>
+        <button onclick="addToCart('Laptop', 50000)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+        <h3>Mouse</h3>
+        <p>Price: Rs. 500</p>
+        <button onclick="addToCart('Mouse', 500)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+        <h3>Keyboard</h3>
+        <p>Price: Rs. 1500</p>
+        <button onclick="addToCart('Keyboard', 1500)">Add to Cart</button>
+    </div>
+
+    <div class="product">
+        <h3>Monitor</h3>
+        <p>Price: Rs. 15000</p>
+        <button onclick="addToCart('Monitor', 15000)">Add to Cart</button>
+    </div>
+
+    <h2>Shopping Cart</h2>
+    <table id="cartTable">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="cartBody">
+        </tbody>
+    </table>
+
+    <p id="total">Total: Rs. 0</p>
+
+    <script>
+        var cart = [];
+
+        function addToCart(itemName, price) {
+            try {
+                if (itemName == null || itemName == "") {
+                    throw "Invalid item name!";
+                }
+
+                if (price == null || price <= 0 || isNaN(price)) {
+                    throw "Invalid price!";
+                }
+
+                var found = false;
+                for (var i = 0; i < cart.length; i++) {
+                    if (cart[i].name == itemName) {
+                        cart[i].quantity = cart[i].quantity + 1;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    var item = {
+                        name: itemName,
+                        price: price,
+                        quantity: 1
+                    };
+                    cart[cart.length] = item;
+                }
+
+                displayCart();
+                alert(itemName + " added to cart!");
+
+            } catch (error) {
+                alert("Error: " + error);
+            }
+        }
+
+        function removeFromCart(index) {
+            try {
+                if (index < 0 || index >= cart.length) {
+                    throw "Invalid item index!";
+                }
+
+                var removedItem = cart[index].name;
+
+                var newCart = [];
+                for (var i = 0; i < cart.length; i++) {
+                    if (i != index) {
+                        newCart[newCart.length] = cart[i];
+                    }
+                }
+                cart = newCart;
+
+                displayCart();
+                alert(removedItem + " removed from cart!");
+
+            } catch (error) {
+                alert("Error: " + error);
+            }
+        }
+
+        function displayCart() {
+            var cartBody = document.getElementById("cartBody");
+            cartBody.innerHTML = "";
+
+            var total = 0;
+            for (var i = 0; i < cart.length; i++) {
+                var item = cart[i];
+                var subtotal = item.price * item.quantity;
+                total = total + subtotal;
+
+                var row = document.createElement("tr");
+
+                var nameCell = document.createElement("td");
+                nameCell.innerHTML = item.name;
+
+                var priceCell = document.createElement("td");
+                priceCell.innerHTML = "Rs. " + item.price;
+
+                var quantityCell = document.createElement("td");
+                quantityCell.innerHTML = item.quantity;
+
+                var subtotalCell = document.createElement("td");
+                subtotalCell.innerHTML = "Rs. " + subtotal;
+
+                var actionCell = document.createElement("td");
+                var removeBtn = document.createElement("button");
+                removeBtn.innerHTML = "Remove";
+                removeBtn.className = "remove-btn";
+                removeBtn.onclick = function(index) {
+                    return function() {
+                        removeFromCart(index);
+                    };
+                }(i);
+
+                actionCell.appendChild(removeBtn);
+
+                row.appendChild(nameCell);
+                row.appendChild(priceCell);
+                row.appendChild(quantityCell);
+                row.appendChild(subtotalCell);
+                row.appendChild(actionCell);
+                cartBody.appendChild(row);
+            }
+            document.getElementById("total").innerHTML = "Total: Rs. " + total;
+        }
+    </script>
+</body>
+
+</html>
