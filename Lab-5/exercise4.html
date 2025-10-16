@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .reset-btn {
+            background-color: #f44336;
+        }
+
+        .reset-btn:hover {
+            background-color: #da190b;
+        }
+
+        .delete-btn {
+            background-color: #ff9800;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background-color: #e68900;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #totalExpense {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+            color: #333;
+        }
+
+        .filter-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .invalid {
+            border-color: red !important;
+            background-color: #ffe6e6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Expense Tracker Dashboard</h2>
+
+        <form id="expenseForm" onsubmit="return false;">
+            <div class="form-group">
+                <label>Description:</label>
+                <input type="text" id="description" placeholder="Enter expense description">
+            </div>
+
+            <div class="form-group">
+                <label>Amount:</label>
+                <input type="text" id="amount" placeholder="Enter amount">
+            </div>
+
+            <div class="form-group">
+                <label>Category:</label>
+                <select id="category">
+                    <option value="">-- Select Category --</option>
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="addExpense()">Add Expense</button>
+            <button type="button" class="reset-btn" onclick="resetAll()">Reset All</button>
+        </form>
+
+        <div class="filter-section">
+            <label>Filter by Category:</label>
+            <select id="filterCategory" onchange="filterExpenses()">
+                <option value="All">All Categories</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <table id="expenseTable">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Amount (Rs.)</th>
+                    <th>Category</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="expenseBody">
+            </tbody>
+        </table>
+
+        <p id="totalExpense">Total Expenses: Rs. 0</p>
+    </div>
+
+    <script>
+        var expenses = [];
+
+        function Expense(desc, amount, category) {
+            this.description = desc;
+            this.amount = amount;
+            this.category = category;
+            this.id = new Date().getTime();
+        }
+
+        function addExpense() {
+            try {
+                var descInput = document.getElementById("description");
+                var amountInput = document.getElementById("amount");
+                var categoryInput = document.getElementById("category");
+
+                var desc = descInput.value;
+                var amount = amountInput.value;
+                var category = categoryInput.value;
+
+                descInput.className = "";
+                amountInput.className = "";
+                categoryInput.className = "";
+
+                if (desc == null || desc.trim() == "") {
+                    descInput.className = "invalid";
+                    throw "Description cannot be empty!";
+                }
+
+                if (amount == null || amount.trim() == "") {
+                    amountInput.className = "invalid";
+                    throw "Amount cannot be empty!";
+                }
+
+                amount = parseFloat(amount);
+                if (isNaN(amount) || amount <= 0) {
+                    amountInput.className = "invalid";
+                    throw "Amount must be a valid positive number!";
+                }
+
+                if (category == null || category == "") {
+                    categoryInput.className = "invalid";
+                    throw "Please select a category!";
+                }
+
+                var newExpense = new Expense(desc, amount, category);
+                expenses[expenses.length] = newExpense;
+
+                descInput.value = "";
+                amountInput.value = "";
+                categoryInput.value = "";
+
+                displayExpenses();
+                alert("Expense added successfully!");
+
+            } catch (error) {
+                alert("Error: " + error);
+            }
+        }
+
+        function displayExpenses() {
+            var filterValue = document.getElementById("filterCategory").value;
+            var tbody = document.getElementById("expenseBody");
+            tbody.innerHTML = "";
+
+            var total = 0;
+
+            for (var i = 0; i < expenses.length; i++) {
+                var expense = expenses[i];
+
+                if (filterValue == "All" || expense.category == filterValue) {
+                    var row = document.createElement("tr");
+
+                    var descCell = document.createElement("td");
+                    descCell.innerHTML = expense.description;
+
+                    var amountCell = document.createElement("td");
+                    amountCell.innerHTML = expense.amount;
+
+                    var categoryCell = document.createElement("td");
+                    categoryCell.innerHTML = expense.category;
+
+                    var actionCell = document.createElement("td");
+                    var deleteBtn = document.createElement("button");
+                    deleteBtn.innerHTML = "Delete";
+                    deleteBtn.className = "delete-btn";
+                    deleteBtn.onclick = function(index) {
+                        return function() {
+                            deleteExpense(index);
+                        };
+                    }(i);
+
+                    actionCell.appendChild(deleteBtn);
+
+                    row.appendChild(descCell);
+                    row.appendChild(amountCell);
+                    row.appendChild(categoryCell);
+                    row.appendChild(actionCell);
+
+                    tbody.appendChild(row);
+                }
+
+                total = total + expense.amount;
+            }
+
+            document.getElementById("totalExpense").innerHTML = "Total Expenses: Rs. " + total.toFixed(2);
+        }
+
+        function deleteExpense(index) {
+            try {
+                if (index < 0 || index >= expenses.length) {
+                    throw "Invalid expense index!";
+                }
+
+                var newExpenses = [];
+                for (var i = 0; i < expenses.length; i++) {
+                    if (i != index) {
+                        newExpenses[newExpenses.length] = expenses[i];
+                    }
+                }
+                expenses = newExpenses;
+
+                displayExpenses();
+                alert("Expense deleted successfully!");
+
+            } catch (error) {
+                alert("Error: " + error);
+            }
+        }
+
+        function filterExpenses() {
+            displayExpenses();
+        }
+
+        function resetAll() {
+            if (expenses.length == 0) {
+                alert("No expenses to reset!");
+                return;
+            }
+
+            var confirm = window.confirm("Are you sure you want to delete all expenses?");
+            if (confirm) {
+                expenses = [];
+                displayExpenses();
+                document.getElementById("filterCategory").value = "All";
+                alert("All expenses cleared!");
+            }
+        }
+    </script>
+</body>
+
+</html>
