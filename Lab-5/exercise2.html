@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #e5ddd5;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #dcf8c6;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: white;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #sendBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #sendBtn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Chat Application</h2>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+            <!-- Messages will appear here -->
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="checkEnter(event)">
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        var messages = [];
+
+        function Message(text, sender) {
+            this.text = text;
+            this.sender = sender;
+            this.timestamp = new Date();
+        }
+
+        function sendMessage() {
+            try {
+                var input = document.getElementById("messageInput");
+                var messageText = input.value;
+
+                if (messageText == null || messageText.trim() == "") {
+                    throw "Message cannot be empty!";
+                }
+
+                var newMessage = new Message(messageText, "User");
+
+                messages[messages.length] = newMessage;
+
+                displayMessage(newMessage);
+
+                input.value = "";
+
+                setTimeout(function() {
+                    autoReply(messageText);
+                }, 1000);
+
+            } catch (error) {
+                alert("Error: " + error);
+            }
+        }
+
+        function displayMessage(message) {
+            var chatBox = document.getElementById("chatBox");
+
+            var messageDiv = document.createElement("div");
+            messageDiv.className = "message";
+
+            if (message.sender == "User") {
+                messageDiv.className = messageDiv.className + " user-message";
+            } else {
+                messageDiv.className = messageDiv.className + " bot-message";
+            }
+
+            var senderSpan = document.createElement("div");
+            senderSpan.className = "message-sender";
+            senderSpan.innerHTML = message.sender;
+
+            var textSpan = document.createElement("div");
+            textSpan.innerHTML = message.text;
+
+            messageDiv.appendChild(senderSpan);
+            messageDiv.appendChild(textSpan);
+            chatBox.appendChild(messageDiv);
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function autoReply(userMessage) {
+            var replyText = "";
+            var lowerMessage = userMessage.toLowerCase();
+
+            if (lowerMessage.indexOf("hello") != -1 || lowerMessage.indexOf("hi") != -1) {
+                replyText = "Hello! How can I help you today?";
+            } else if (lowerMessage.indexOf("how are you") != -1) {
+                replyText = "I'm doing great! Thanks for asking.";
+            } else if (lowerMessage.indexOf("bye") != -1 || lowerMessage.indexOf("goodbye") != -1) {
+                replyText = "Goodbye! Have a great day!";
+            } else if (lowerMessage.indexOf("help") != -1) {
+                replyText = "I'm here to help! What do you need?";
+            } else if (lowerMessage.indexOf("name") != -1) {
+                replyText = "I'm ChatBot, your virtual assistant!";
+            } else {
+                replyText = "Thanks for your message! I'm processing it.";
+            }
+
+            var botMessage = new Message(replyText, "Bot");
+
+            messages[messages.length] = botMessage;
+
+            displayMessage(botMessage);
+        }
+
+        function checkEnter(event) {
+            if (event.keyCode == 13) {
+                sendMessage();
+            }
+        }
+
+        window.onload = function() {
+            var welcomeMessage = new Message("Welcome to the chat! Type a message to start.", "Bot");
+            messages[messages.length] = welcomeMessage;
+            displayMessage(welcomeMessage);
+        };
+    </script>
+</body>
+
+</html>
