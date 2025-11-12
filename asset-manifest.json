@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/Web-Engineering-Lab_Assignments/Lab-7/static/css/main.746e51fc.css",
-    "main.js": "/Web-Engineering-Lab_Assignments/Lab-7/static/js/main.30787f93.js",
-    "index.html": "/Web-Engineering-Lab_Assignments/Lab-7/index.html",
-    "main.746e51fc.css.map": "/Web-Engineering-Lab_Assignments/Lab-7/static/css/main.746e51fc.css.map",
-    "main.30787f93.js.map": "/Web-Engineering-Lab_Assignments/Lab-7/static/js/main.30787f93.js.map"
+    "main.css": "/Web-Engineering-Lab_Assignments/static/css/main.746e51fc.css",
+    "main.js": "/Web-Engineering-Lab_Assignments/static/js/main.30787f93.js",
+    "index.html": "/Web-Engineering-Lab_Assignments/index.html",
+    "main.746e51fc.css.map": "/Web-Engineering-Lab_Assignments/static/css/main.746e51fc.css.map",
+    "main.30787f93.js.map": "/Web-Engineering-Lab_Assignments/static/js/main.30787f93.js.map"
   },
   "entrypoints": [
     "static/css/main.746e51fc.css",
