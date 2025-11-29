@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Charlie and the Chocolate Factory",
+    "author": "Roald Dahl",
+    "price": 12.24
+  },
+  {
+    "id": 2,
+    "title": "Welcome to Horrorland",
+    "author": "RL Stein",
+    "price": 15.5
+  },
+  {
+    "id": 3,
+    "title": "Diary of a Wimpy Kid",
+    "author": "Jeff Kinney",
+    "price": 11.25
+  },
+  {
+    "id": 5,
+    "title": "1984",
+    "author": "George Orwell",
+    "year": 1949
+  }
+]
